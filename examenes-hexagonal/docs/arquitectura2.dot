@@ -1,0 +1,30 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad="0.4", nodesep="0.4", ranksep="0.6", fontname="DejaVu Sans", fontsize=18];
+ node [shape=record, fontname="DejaVu Sans", fontsize=11, style="filled", fillcolor="#eff5fa", color="#55758a", margin="0.15,0.1"];
+ edge [fontname="DejaVu Sans", fontsize=9, color="#365d72", arrowsize=0.8];
+
+ label="Arquitectura hexagonal / dependencias del código"; labelloc=t;
+ subgraph cluster_entrada {label="Adaptador de entrada";color="#7a9eb2"; UI [label="FXML original"]; C [label="ControladorExamenes"]; UI -> C [style=dashed,label="eventos"];}
+ subgraph cluster_nucleo {label="Núcleo independiente de JavaFX y archivos";color="#47a58c";style=rounded;
+  IN [label="{«puerto de entrada»|RegistroExamenes}",fillcolor="#dcefe9"];
+  S [label="{Aplicación|ServicioExamenes\lOrdenExamen (Strategy)\l}",fillcolor="#dcefe9"];
+  D [label="{Dominio|Examen + Builder\lTipoSangre / FactorRh\l}",fillcolor="#dcefe9"];
+  OUT [label="{«puerto de salida»|AlmacenExamenes\lPersistenciaException\l}",fillcolor="#dcefe9"];
+  S -> IN [style=dashed,arrowhead=empty,label="implementa"];
+  S -> D [label="usa"];
+  S -> OUT [label="depende de"];
+ }
+ subgraph cluster_salida {label="Adaptador de salida";color="#7a9eb2"; A [label="ArchivoXmlExamenes"]; P [label="Properties XML + NIO"]; Archivo [shape=folder,label="datos/examenes.xml"];A -> P [label="adapta"];P -> Archivo [label="lee / escribe"];}
+ C -> IN [label="invoca"];
+ C -> D [style=dashed,label="construye datos"];
+ A -> OUT [style=dashed,arrowhead=empty,label="implementa"];
+ A -> D [style=dashed,label="mapea"];
+ App [label="{bootstrap.App|Compone e inyecta dependencias}",fillcolor="#fff0dd"];
+ App -> C [style=dotted,label="crea"];
+ App -> S [style=dotted,label="crea"];
+ App -> A [style=dotted,label="crea"];
+ ley [shape=note,label="Flecha: dependencia hacia el destino.
+Triángulo vacío discontinuo: realización.
+App es el punto de composición externo.",fillcolor="#ffffff"];
+
+}

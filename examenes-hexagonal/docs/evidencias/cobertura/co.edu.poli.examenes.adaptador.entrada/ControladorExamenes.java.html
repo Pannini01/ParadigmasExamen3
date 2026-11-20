@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControladorExamenes.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Exámenes de Sangre - Arquitectura Hexagonal</a> &gt; <a href="index.source.html" class="el_package">co.edu.poli.examenes.adaptador.entrada</a> &gt; <span class="el_source">ControladorExamenes.java</span></div><h1>ControladorExamenes.java</h1><pre class="source lang-java linenums">package co.edu.poli.examenes.adaptador.entrada;
+
+import co.edu.poli.examenes.aplicacion.puerto.entrada.RegistroExamenes;
+import co.edu.poli.examenes.aplicacion.puerto.salida.PersistenciaException;
+import co.edu.poli.examenes.dominio.Examen;
+import co.edu.poli.examenes.dominio.FactorRh;
+import co.edu.poli.examenes.dominio.TipoSangre;
+import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+
+/** Adaptador de entrada: convierte datos de pantalla y delega al puerto de aplicación. */
+public final class ControladorExamenes {
+    private final RegistroExamenes registro;
+    private final Comparator&lt;Examen&gt; orden;
+    @FXML private TextField txtCodigoExamen;
+    @FXML private TextField txtNombrePaciente;
+    @FXML private TextField txtCosto;
+    @FXML private ComboBox&lt;String&gt; cmbTipoSangre;
+    @FXML private RadioButton rbPositivo;
+    @FXML private TextArea txtAreaMensajes;
+
+    /**
+     * Conecta la vista original con los casos de uso y la estrategia configurada.
+     * @param registro casos de uso sin dependencias de JavaFX
+     * @param orden criterio de listado inyectado por App
+     */
+<span class="fc" id="L34">    public ControladorExamenes(RegistroExamenes registro, Comparator&lt;Examen&gt; orden) {</span>
+<span class="fc" id="L35">        this.registro = Objects.requireNonNull(registro);</span>
+<span class="fc" id="L36">        this.orden = Objects.requireNonNull(orden);</span>
+<span class="fc" id="L37">    }</span>
+
+    @FXML private void handleGuardar() {
+<span class="fc" id="L40">        ejecutar(() -&gt; {</span>
+<span class="fc" id="L41">            Examen examen = Examen.builder().codigo(txtCodigoExamen.getText())</span>
+<span class="fc" id="L42">                    .paciente(txtNombrePaciente.getText()).costo(costoIngresado())</span>
+<span class="fc" id="L43">                    .tipoSangre(tipoSeleccionado())</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">                    .factorRh(rbPositivo.isSelected() ? FactorRh.POSITIVO : FactorRh.NEGATIVO).build();</span>
+<span class="fc" id="L45">            registro.guardar(examen);</span>
+<span class="fc" id="L46">            txtAreaMensajes.setText(&quot;Examen &quot; + examen.codigo() + &quot; guardado en la sesión. Use Serializar para conservarlo al cerrar.&quot;);</span>
+<span class="fc" id="L47">        });</span>
+<span class="fc" id="L48">    }</span>
+
+    private BigDecimal costoIngresado() {
+<span class="fc" id="L51">        String texto = txtCosto.getText().strip();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (!texto.matches(&quot;\\d+([.,]\\d{1,2})?&quot;)) {</span>
+<span class="fc" id="L53">            throw new IllegalArgumentException(&quot;Ingrese un costo no negativo, sin separador de miles y con hasta dos decimales.&quot;);</span>
+        }
+<span class="fc" id="L55">        return new BigDecimal(texto.replace(',', '.'));</span>
+    }
+
+    private TipoSangre tipoSeleccionado() {
+<span class="fc" id="L59">        String seleccion = cmbTipoSangre.getValue();</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        return seleccion == null ? null : TipoSangre.valueOf(seleccion);</span>
+    }
+
+    @FXML private void handleSerializar() {
+<span class="fc" id="L64">        ejecutar(() -&gt; { registro.serializar(); txtAreaMensajes.setText(&quot;Sesión serializada correctamente en el archivo XML.&quot;); });</span>
+<span class="fc" id="L65">    }</span>
+    @FXML private void handleDeserializar() {
+<span class="fc" id="L67">        ejecutar(() -&gt; { registro.deserializar(); mostrarListado(&quot;Sesión recuperada.\n&quot;); });</span>
+<span class="fc" id="L68">    }</span>
+<span class="fc" id="L69">    @FXML private void handleListar() { ejecutar(() -&gt; mostrarListado(&quot;&quot;)); }</span>
+
+    private void mostrarListado(String prefijo) {
+<span class="fc" id="L72">        String listado = registro.listar(orden).stream()</span>
+<span class="fc" id="L73">                .map(examen -&gt; &quot;%s | %s | $%s | %s %s&quot;.formatted(examen.codigo(), examen.paciente(),</span>
+<span class="fc" id="L74">                        examen.costo().toPlainString(), examen.tipoSangre(), examen.factorRh()))</span>
+<span class="fc" id="L75">                .collect(Collectors.joining(&quot;\n&quot;));</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        txtAreaMensajes.setText(prefijo + (listado.isEmpty() ? &quot;No hay exámenes registrados.&quot; : listado));</span>
+<span class="fc" id="L77">    }</span>
+
+    private void ejecutar(Runnable accion) {
+<span class="fc" id="L80">        try { accion.run(); }</span>
+<span class="fc" id="L81">        catch (IllegalArgumentException | PersistenciaException ex) { txtAreaMensajes.setText(&quot;Error: &quot; + ex.getMessage()); }</span>
+<span class="fc" id="L82">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

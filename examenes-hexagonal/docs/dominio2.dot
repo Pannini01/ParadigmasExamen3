@@ -1,0 +1,23 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad="0.4", nodesep="0.4", ranksep="0.6", fontname="DejaVu Sans", fontsize=18];
+ node [shape=record, fontname="DejaVu Sans", fontsize=11, style="filled", fillcolor="#eff5fa", color="#55758a", margin="0.15,0.1"];
+ edge [fontname="DejaVu Sans", fontsize=9, color="#365d72", arrowsize=0.8];
+
+ label="Dominio y contratos de la solución propuesta"; labelloc=t;
+ Examen [label="{«record inmutable» Examen|codigo : String\lpaciente : String\lcosto : BigDecimal\ltipoSangre : TipoSangre\lfactorRh : FactorRh\l|Valida texto, costo y selecciones\lNormaliza código\l}",fillcolor="#dcefe9"];
+ Tipo [label="{«enum» TipoSangre|A; B; AB; O}"];
+ Rh [label="{«enum» FactorRh|POSITIVO; NEGATIVO}"];
+ Casos [label="{«puerto de entrada» RegistroExamenes|guardar(Examen)\llistar(Comparator) : List\lserializar()\ldeserializar()\l}"];
+ Servicio [label="{ServicioExamenes|sesion : Map de código a Examen|Unicidad de códigos\lRestauración completa o sin cambios\l}"];
+ Almacen [label="{«puerto de salida» AlmacenExamenes|escribir(List de Examen)\lleer() : List de Examen\l}"];
+ Servicio -> Casos [style=dashed,arrowhead=empty,label="realiza"];
+ Servicio -> Almacen [label="1 almacen"];
+ Servicio -> Examen [dir=both,arrowtail=odiamond,arrowhead=none,label="0..* / sesión"];
+ Examen -> Tipo [label="1"];
+ Examen -> Rh [label="1"];
+ Almacen -> Examen [style=dashed,label="usa en contrato"];
+ nota [shape=note,label="Modelo propuesto en actividad 2.
+Builder y estrategias se detallan en dominio3.
+No se implementan operaciones clínicas.",fillcolor="#fff0dd"];
+
+}

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Examen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Exámenes de Sangre - Arquitectura Hexagonal</a> &gt; <a href="index.source.html" class="el_package">co.edu.poli.examenes.dominio</a> &gt; <span class="el_source">Examen.java</span></div><h1>Examen.java</h1><pre class="source lang-java linenums">package co.edu.poli.examenes.dominio;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Locale;
+
+/**
+ * Examen inmutable y válido. Builder permite expresar los cinco datos por nombre.
+ * @param codigo identificador único, normalizado a mayúsculas
+ * @param paciente nombre no vacío
+ * @param costo importe no negativo con hasta dos decimales significativos
+ * @param tipoSangre grupo registrado
+ * @param factorRh factor registrado
+ */
+public record Examen(String codigo, String paciente, BigDecimal costo,
+                     TipoSangre tipoSangre, FactorRh factorRh) {
+    /** Valida también la construcción directa y la recuperación desde archivos. */
+<span class="fc" id="L18">    public Examen {</span>
+<span class="fc" id="L19">        codigo = texto(codigo, &quot;Código&quot;, 40).toUpperCase(Locale.ROOT);</span>
+<span class="fc" id="L20">        paciente = texto(paciente, &quot;Paciente&quot;, 120);</span>
+<span class="fc bfc" id="L21" title="All 4 branches covered.">        if (costo == null || costo.signum() &lt; 0) {</span>
+<span class="fc" id="L22">            throw new IllegalArgumentException(&quot;El costo debe ser mayor o igual a cero.&quot;);</span>
+        }
+        try {
+<span class="fc" id="L25">            costo = costo.setScale(2, RoundingMode.UNNECESSARY);</span>
+<span class="fc" id="L26">        } catch (ArithmeticException ex) {</span>
+<span class="fc" id="L27">            throw new IllegalArgumentException(&quot;El costo admite hasta dos decimales.&quot;, ex);</span>
+<span class="fc" id="L28">        }</span>
+<span class="fc bfc" id="L29" title="All 4 branches covered.">        if (tipoSangre == null || factorRh == null) {</span>
+<span class="fc" id="L30">            throw new IllegalArgumentException(&quot;Seleccione el grupo sanguíneo y el factor Rh.&quot;);</span>
+        }
+<span class="fc" id="L32">    }</span>
+
+    private static String texto(String valor, String campo, int maximo) {
+<span class="fc bfc" id="L35" title="All 6 branches covered.">        if (valor == null || valor.isBlank() || valor.strip().length() &gt; maximo</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">                || valor.codePoints().anyMatch(Character::isISOControl)) {</span>
+<span class="fc" id="L37">            throw new IllegalArgumentException(campo + &quot;: ingrese entre 1 y &quot; + maximo + &quot; caracteres sin controles.&quot;);</span>
+        }
+<span class="fc" id="L39">        return valor.strip();</span>
+    }
+
+    /**
+ * @return un constructor independiente, sin estado compartido
+ */
+<span class="fc" id="L45">    public static Builder builder() { return new Builder(); }</span>
+
+    /** Constructor gradual GoF; build delega todas las invariantes al producto. */
+    public static final class Builder {
+        private String codigo;
+        private String paciente;
+        private BigDecimal costo;
+        private TipoSangre tipoSangre;
+        private FactorRh factorRh;
+
+        private Builder() { }
+        /**
+ * @param valor código del examen
+ * @return este constructor
+ */
+<span class="fc" id="L60">        public Builder codigo(String valor) { codigo = valor; return this; }</span>
+        /**
+ * @param valor nombre del paciente
+ * @return este constructor
+ */
+<span class="fc" id="L65">        public Builder paciente(String valor) { paciente = valor; return this; }</span>
+        /**
+ * @param valor costo monetario
+ * @return este constructor
+ */
+<span class="fc" id="L70">        public Builder costo(BigDecimal valor) { costo = valor; return this; }</span>
+        /**
+ * @param valor grupo sanguíneo
+ * @return este constructor
+ */
+<span class="fc" id="L75">        public Builder tipoSangre(TipoSangre valor) { tipoSangre = valor; return this; }</span>
+        /**
+ * @param valor factor Rh
+ * @return este constructor
+ */
+<span class="fc" id="L80">        public Builder factorRh(FactorRh valor) { factorRh = valor; return this; }</span>
+        /**
+ * @return un examen válido e inmutable
+ * @throws IllegalArgumentException si falta un dato o es inválido
+ */
+<span class="fc" id="L85">        public Examen build() { return new Examen(codigo, paciente, costo, tipoSangre, factorRh); }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

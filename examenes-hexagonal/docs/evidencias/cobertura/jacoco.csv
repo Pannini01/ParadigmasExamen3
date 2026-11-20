@@ -1,0 +1,11 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.adaptador.entrada,ControladorExamenes,2,187,1,7,0,33,1,17,0,14
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.aplicacion,OrdenExamen,3,41,0,0,1,9,1,3,1,3
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.aplicacion,ServicioExamenes,0,72,0,2,0,13,0,8,0,7
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.aplicacion.puerto.salida,PersistenciaException,0,5,0,0,0,1,0,1,0,1
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.adaptador.salida,ArchivoXmlExamenes,12,273,0,16,2,51,0,15,0,7
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.dominio,Examen,0,91,0,16,0,17,0,11,0,3
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.dominio,FactorRh,0,15,0,0,0,1,0,1,0,1
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.dominio,Examen.Builder,0,39,0,0,0,6,0,6,0,6
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.dominio,TipoSangre,0,27,0,0,0,1,0,1,0,1
+Exámenes de Sangre - Arquitectura Hexagonal,co.edu.poli.examenes.bootstrap,App,3,62,0,0,1,11,1,3,1,3

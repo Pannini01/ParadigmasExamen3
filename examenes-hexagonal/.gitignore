@@ -1,0 +1,8 @@
+/target/
+/datos/
+/.scannerwork/
+/.settings/
+/.classpath
+/.project
+*.log
+.env

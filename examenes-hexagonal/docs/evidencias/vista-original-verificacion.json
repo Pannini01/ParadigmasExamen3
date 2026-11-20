@@ -1,0 +1,11 @@
+{
+  "resultado": "IDENTICO excepto fx:controller",
+  "sha256_original": "7f3bfa59568dd7f5aba0becd9352187ba801e2ced566b2778bd193cad4946d35",
+  "sha256_vista_normalizada": "7f3bfa59568dd7f5aba0becd9352187ba801e2ced566b2778bd193cad4946d35",
+  "prueba": "VistaTest.conservaFXMLOriginalSalvoReferenciaDelControlador",
+  "escena": {
+    "ancho": 640,
+    "alto": 580,
+    "redimensionable": false
+  }
+}

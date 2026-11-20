@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArchivoXmlExamenes.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Exámenes de Sangre - Arquitectura Hexagonal</a> &gt; <a href="index.source.html" class="el_package">co.edu.poli.examenes.adaptador.salida</a> &gt; <span class="el_source">ArchivoXmlExamenes.java</span></div><h1>ArchivoXmlExamenes.java</h1><pre class="source lang-java linenums">package co.edu.poli.examenes.adaptador.salida;
+
+import co.edu.poli.examenes.aplicacion.puerto.salida.AlmacenExamenes;
+import co.edu.poli.examenes.aplicacion.puerto.salida.PersistenciaException;
+import co.edu.poli.examenes.dominio.Examen;
+import co.edu.poli.examenes.dominio.FactorRh;
+import co.edu.poli.examenes.dominio.TipoSangre;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+
+/** Adaptador GoF de AlmacenExamenes a Properties XML y NIO; formato versionado sin objetos Java serializados. */
+public final class ArchivoXmlExamenes implements AlmacenExamenes {
+    private static final String VERSION = &quot;1&quot;;
+    private static final int MAX_REGISTROS = 10_000;
+    private final Path archivo;
+
+    /**
+ * @param archivo ubicación de la instantánea; se crean sus directorios al escribir
+ */
+<span class="fc" id="L30">    public ArchivoXmlExamenes(Path archivo) { this.archivo = Objects.requireNonNull(archivo).toAbsolutePath(); }</span>
+
+    /**
+ * {@inheritDoc}
+ */
+    @Override public void escribir(List&lt;Examen&gt; examenes) {
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (examenes.size() &gt; MAX_REGISTROS) {</span>
+<span class="fc" id="L37">            throw new PersistenciaException(&quot;El archivo admite hasta 10000 exámenes.&quot;, null);</span>
+        }
+<span class="fc" id="L39">        Properties datos = new Properties();</span>
+<span class="fc" id="L40">        datos.setProperty(&quot;version&quot;, VERSION);</span>
+<span class="fc" id="L41">        datos.setProperty(&quot;cantidad&quot;, Integer.toString(examenes.size()));</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        for (int i = 0; i &lt; examenes.size(); i++) {</span>
+<span class="fc" id="L43">            codificar(datos, i + &quot;.&quot;, examenes.get(i));</span>
+        }
+        try {
+<span class="fc" id="L46">            Files.createDirectories(archivo.getParent());</span>
+<span class="fc" id="L47">            guardarTemporal(datos);</span>
+<span class="fc" id="L48">        } catch (IOException ex) {</span>
+<span class="fc" id="L49">            throw new PersistenciaException(&quot;No se pudo guardar el archivo de exámenes.&quot;, ex);</span>
+<span class="fc" id="L50">        }</span>
+<span class="fc" id="L51">    }</span>
+
+    private static void codificar(Properties datos, String prefijo, Examen examen) {
+<span class="fc" id="L54">        datos.setProperty(prefijo + &quot;codigo&quot;, examen.codigo());</span>
+<span class="fc" id="L55">        datos.setProperty(prefijo + &quot;paciente&quot;, examen.paciente());</span>
+<span class="fc" id="L56">        datos.setProperty(prefijo + &quot;costo&quot;, examen.costo().toPlainString());</span>
+<span class="fc" id="L57">        datos.setProperty(prefijo + &quot;tipo&quot;, examen.tipoSangre().name());</span>
+<span class="fc" id="L58">        datos.setProperty(prefijo + &quot;rh&quot;, examen.factorRh().name());</span>
+<span class="fc" id="L59">    }</span>
+
+    private void guardarTemporal(Properties datos) throws IOException {
+<span class="fc" id="L62">        Path temporal = Files.createTempFile(archivo.getParent(), &quot;examenes-&quot;, &quot;.tmp&quot;);</span>
+        try {
+<span class="fc" id="L64">            try (OutputStream salida = Files.newOutputStream(temporal)) {</span>
+<span class="fc" id="L65">                datos.storeToXML(salida, &quot;Exámenes de sangre - formato 1&quot;, &quot;UTF-8&quot;);</span>
+            }
+            try {
+<span class="fc" id="L68">                Files.move(temporal, archivo, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);</span>
+<span class="nc" id="L69">            } catch (AtomicMoveNotSupportedException ex) {</span>
+<span class="nc" id="L70">                Files.move(temporal, archivo, StandardCopyOption.REPLACE_EXISTING);</span>
+<span class="fc" id="L71">            }</span>
+        } finally {
+<span class="fc" id="L73">            Files.deleteIfExists(temporal);</span>
+        }
+<span class="fc" id="L75">    }</span>
+
+    /**
+ * {@inheritDoc}
+ */
+    @Override public List&lt;Examen&gt; leer() {
+<span class="fc" id="L81">        try (InputStream entrada = Files.newInputStream(archivo)) {</span>
+<span class="fc" id="L82">            Properties datos = new Properties();</span>
+<span class="fc" id="L83">            datos.loadFromXML(entrada);</span>
+<span class="fc" id="L84">            return decodificar(datos);</span>
+<span class="fc" id="L85">        } catch (IOException | IllegalArgumentException ex) {</span>
+<span class="fc" id="L86">            throw new PersistenciaException(&quot;No se pudo cargar el archivo. Verifique su existencia y formato.&quot;, ex);</span>
+        }
+    }
+
+    private static List&lt;Examen&gt; decodificar(Properties datos) {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (!VERSION.equals(datos.getProperty(&quot;version&quot;))) {</span>
+<span class="fc" id="L92">            throw new IllegalArgumentException(&quot;Versión de archivo incompatible.&quot;);</span>
+        }
+<span class="fc" id="L94">        int cantidad = Integer.parseInt(requerido(datos, &quot;cantidad&quot;));</span>
+<span class="fc bfc" id="L95" title="All 6 branches covered.">        if (cantidad &lt; 0 || cantidad &gt; MAX_REGISTROS || datos.size() != 2 + cantidad * 5) {</span>
+<span class="fc" id="L96">            throw new IllegalArgumentException(&quot;Cantidad de registros o campos inconsistente.&quot;);</span>
+        }
+<span class="fc" id="L98">        List&lt;Examen&gt; resultado = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        for (int i = 0; i &lt; cantidad; i++) {</span>
+<span class="fc" id="L100">            String prefijo = i + &quot;.&quot;;</span>
+<span class="fc" id="L101">            resultado.add(Examen.builder()</span>
+<span class="fc" id="L102">                    .codigo(requerido(datos, prefijo + &quot;codigo&quot;))</span>
+<span class="fc" id="L103">                    .paciente(requerido(datos, prefijo + &quot;paciente&quot;))</span>
+<span class="fc" id="L104">                    .costo(new BigDecimal(requerido(datos, prefijo + &quot;costo&quot;)))</span>
+<span class="fc" id="L105">                    .tipoSangre(TipoSangre.valueOf(requerido(datos, prefijo + &quot;tipo&quot;)))</span>
+<span class="fc" id="L106">                    .factorRh(FactorRh.valueOf(requerido(datos, prefijo + &quot;rh&quot;))).build());</span>
+        }
+<span class="fc" id="L108">        return List.copyOf(resultado);</span>
+    }
+
+    private static String requerido(Properties datos, String clave) {
+<span class="fc" id="L112">        String valor = datos.getProperty(clave);</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (valor == null) { throw new IllegalArgumentException(&quot;Falta el campo &quot; + clave + &quot;.&quot;); }</span>
+<span class="fc" id="L114">        return valor;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

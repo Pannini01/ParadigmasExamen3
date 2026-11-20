@@ -1,0 +1,22 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad="0.4", nodesep="0.4", ranksep="0.6", fontname="DejaVu Sans", fontsize=18];
+ node [shape=record, fontname="DejaVu Sans", fontsize=11, style="filled", fillcolor="#eff5fa", color="#55758a", margin="0.15,0.1"];
+ edge [fontname="DejaVu Sans", fontsize=9, color="#365d72", arrowsize=0.8];
+
+ label="Arquitectura original observada"; labelloc=t;
+ App [label="{vista.App|scene : static Scene|start(Stage)\lloadFXML(String)\lsetRoot(String)\l}"];
+ FXML [label="{primary.fxml|Campos de datos\l4 botones visibles\lÁrea de mensajes\l}"];
+ Controller [label="{controlador.PrimaryController|Controles JavaFX @FXML|initialize() [vacío]\lhandleGuardar() [vacío]\lhandleLimpiar() [vacío]\lhandleSerializar() [vacío]\lhandleDeserializar() [vacío]\lhandleListar() [vacío]\l}"];
+ FX [label="JavaFX / FXMLLoader", fillcolor="#dcefe9"];
+ POM [label="{pom.xml|Java 11 / JavaFX 13\lmainClass apunta a un paquete incorrecto\l}",fillcolor="#fff0dd"];
+ App -> FX [label="usa"];
+ App -> FXML [label="carga recurso"];
+ FXML -> Controller [label="fx:controller / eventos",style=dashed];
+ Controller -> FX [label="importa"];
+ POM -> App [label="pretende iniciar",style=dashed,color="#bb6c2c"];
+ Ausencia [shape=note,label="No hay entidades, casos de uso,
+puertos, persistencia ni pruebas.
+Limpiar no tiene botón en FXML.",fillcolor="#fff0dd"];
+ Controller -> Ausencia [style=dotted,arrowhead=none];
+
+}

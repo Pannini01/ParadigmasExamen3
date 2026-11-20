@@ -1,0 +1,23 @@
+{
+  "task": {
+    "id": "09a98eab-c0e3-43d7-bd50-828101310d90",
+    "type": "REPORT",
+    "componentId": "60c4779d-3331-415e-bc9f-f7a32f100d7d",
+    "componentKey": "examenes-hexagonal",
+    "componentName": "Exámenes de Sangre",
+    "componentQualifier": "TRK",
+    "analysisId": "0c97f978-a75b-41f6-a609-f9fa77ffa6a9",
+    "status": "SUCCESS",
+    "submittedAt": "2026-11-19T18:57:56-0500",
+    "submitterLogin": "admin",
+    "startedAt": "2026-11-19T18:57:57-0500",
+    "executedAt": "2026-11-19T18:58:06-0500",
+    "executionTimeMs": 8534,
+    "hasScannerContext": true,
+    "warningCount": 1,
+    "warnings": [
+      "SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings."
+    ],
+    "infoMessages": []
+  }
+}

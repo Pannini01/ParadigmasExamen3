@@ -1,0 +1,35 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad="0.4", nodesep="0.4", ranksep="0.6", fontname="DejaVu Sans", fontsize=18];
+ node [shape=record, fontname="DejaVu Sans", fontsize=11, style="filled", fillcolor="#eff5fa", color="#55758a", margin="0.15,0.1"];
+ edge [fontname="DejaVu Sans", fontsize=9, color="#365d72", arrowsize=0.8];
+
+ label="UML de clases / tres patrones GoF implementados"; labelloc=t;
+ Examen [label="{«record / producto» Examen|codigo : String\lpaciente : String\lcosto : BigDecimal\ltipoSangre : TipoSangre\lfactorRh : FactorRh\l|+ builder() : Builder\l+ Examen(...) valida invariantes\l}",fillcolor="#dcefe9"];
+ B [label="{«Builder / clase anidada» Examen.Builder|Datos temporales de construcción|+ codigo(String) : Builder\l+ paciente(String) : Builder\l+ costo(BigDecimal) : Builder\l+ tipoSangre(TipoSangre) : Builder\l+ factorRh(FactorRh) : Builder\l+ build() : Examen\l}",fillcolor="#e4e4fa"];
+ Cat [label="{«enum» TipoSangre|A; B; AB; O}"];
+ Rh [label="{«enum» FactorRh|POSITIVO; NEGATIVO}"];
+ IN [label="{«interface / puerto de entrada» RegistroExamenes|+ guardar(Examen) : void\l+ listar(Comparator) : List\l+ serializar() : void\l+ deserializar() : void\l}"];
+ S [label="{«contexto Strategy» ServicioExamenes|- almacen : AlmacenExamenes\l- sesion : Map de String a Examen\l|Implementa los casos de uso\l}"];
+ CMP [label="{«interface / Strategy (JDK)» Comparator de Examen|+ compare(Examen, Examen) : int\l}",fillcolor="#fff0dd"];
+ O [label="{«enum / estrategias concretas» OrdenExamen|CODIGO\lPACIENTE\l- comparador : Comparator\l|+ compare(Examen, Examen) : int\l}",fillcolor="#fff0dd"];
+ OUT [label="{«interface / Target» AlmacenExamenes|+ escribir(List) : void\l+ leer() : List\l}"];
+ A [label="{«Adapter» ArchivoXmlExamenes|- archivo : Path|+ escribir(List) : void\l+ leer() : List\l- codificar(...)\l- decodificar(...)\l}",fillcolor="#dfedf8"];
+ P [label="{«Adaptee / JDK» Properties|storeToXML(...)\lloadFromXML(...)\l}",fillcolor="#dfedf8"];
+ C [label="{«adaptador de entrada» ControladorExamenes|- registro : RegistroExamenes\l- orden : Comparator de Examen\l|Manejadores de eventos FXML\l}"];
+ B -> Examen [style=dashed,label="«create»"];
+ Examen -> Cat [label="1"]; Examen -> Rh [label="1"];
+ C -> B [style=dashed,label="usa"];
+ C -> IN [label="1 registro"];
+ S -> IN [style=dashed,arrowhead=empty];
+ S -> OUT [label="1 almacen"];
+ S -> Examen [dir=both,arrowtail=odiamond,arrowhead=none,label="0..* / sesión"];
+ S -> CMP [style=dashed,label="parámetro de listar"];
+ O -> CMP [style=dashed,arrowhead=empty];
+ C -> CMP [label="1 orden inyectado"];
+ A -> OUT [style=dashed,arrowhead=empty];
+ A -> P [style=dashed,label="traduce y delega"];
+ A -> B [style=dashed,label="reconstruye"];
+ {rank=same;IN;CMP;OUT;}
+ {rank=same;C;S;O;A;}
+
+}

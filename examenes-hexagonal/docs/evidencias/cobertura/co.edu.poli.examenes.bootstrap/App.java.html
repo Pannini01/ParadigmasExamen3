@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Exámenes de Sangre - Arquitectura Hexagonal</a> &gt; <a href="index.source.html" class="el_package">co.edu.poli.examenes.bootstrap</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package co.edu.poli.examenes.bootstrap;
+
+import co.edu.poli.examenes.adaptador.entrada.ControladorExamenes;
+import co.edu.poli.examenes.adaptador.salida.ArchivoXmlExamenes;
+import co.edu.poli.examenes.aplicacion.ServicioExamenes;
+import co.edu.poli.examenes.aplicacion.OrdenExamen;
+import java.util.Locale;
+import java.io.IOException;
+import java.nio.file.Path;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+/** Punto de composición: único lugar que conoce implementaciones de entrada y salida. */
+<span class="fc" id="L16">public final class App extends Application {</span>
+    /**
+ * Construye las dependencias y muestra la ventana.
+ * @param stage ventana principal
+ * @throws IOException si falta la vista
+ */
+    @Override public void start(Stage stage) throws IOException {
+<span class="fc" id="L23">        Path archivo = Path.of(System.getProperty(&quot;examenes.archivo&quot;, &quot;datos/examenes.xml&quot;));</span>
+<span class="fc" id="L24">        ServicioExamenes servicio = new ServicioExamenes(new ArchivoXmlExamenes(archivo));</span>
+<span class="fc" id="L25">        FXMLLoader loader = new FXMLLoader(App.class.getResource(&quot;/vista/examenes.fxml&quot;));</span>
+<span class="fc" id="L26">        OrdenExamen orden = OrdenExamen.valueOf(System.getProperty(&quot;examenes.orden&quot;, &quot;CODIGO&quot;).toUpperCase(Locale.ROOT));</span>
+<span class="fc" id="L27">        loader.setControllerFactory(tipo -&gt; new ControladorExamenes(servicio, orden));</span>
+<span class="fc" id="L28">        stage.setScene(new Scene(loader.load(), 640, 580));</span>
+<span class="fc" id="L29">        stage.setTitle(&quot;Exámenes de Sangre&quot;);</span>
+<span class="fc" id="L30">        stage.setResizable(false);</span>
+<span class="fc" id="L31">        stage.show();</span>
+<span class="fc" id="L32">    }</span>
+    /**
+ * @param args argumentos de JavaFX
+ */
+<span class="nc" id="L36">    public static void main(String[] args) { launch(args); }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
